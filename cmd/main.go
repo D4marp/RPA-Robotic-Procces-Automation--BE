@@ -17,6 +17,7 @@ func main() {
 	_ = godotenv.Load()
 
 	db := database.Connect()
+	database.Seed(db)
 	scheduler.Start(db)
 
 	r := gin.Default()
