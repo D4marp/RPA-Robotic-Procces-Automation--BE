@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "rpa-backend/internal/initenv"
+
 	"log"
 
 	"github.com/gin-contrib/cors"
