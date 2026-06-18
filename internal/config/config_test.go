@@ -36,3 +36,15 @@ func TestMySQLDSNFromDatabaseURL(t *testing.T) {
 	t.Setenv("DATABASE_URL", "user:pass@tcp(localhost:3306)/mydb?charset=utf8mb4&parseTime=True&loc=Local")
 	assert.Equal(t, "user:pass@tcp(localhost:3306)/mydb?charset=utf8mb4&parseTime=True&loc=Local", config.MySQLDSN())
 }
+
+func TestMySQLDSNFromStandardDatabaseURL(t *testing.T) {
+	t.Setenv("DATABASE_URL", "mysql://myuser:mypass@db-host:3306/rpa_db?charset=utf8mb4")
+	dsn := config.MySQLDSN()
+	assert.Equal(t, "myuser:mypass@tcp(db-host:3306)/rpa_db?charset=utf8mb4&parseTime=True&loc=Local", dsn)
+}
+
+func TestMySQLDSNFromStandardDatabaseURLNoProtocolPrefix(t *testing.T) {
+	t.Setenv("DATABASE_URL", "myuser:mypass@db-host.example.com:3306/rpa_db")
+	dsn := config.MySQLDSN()
+	assert.Equal(t, "myuser:mypass@tcp(db-host.example.com:3306)/rpa_db?charset=utf8mb4&parseTime=True&loc=Local", dsn)
+}
