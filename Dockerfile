@@ -6,7 +6,7 @@ COPY . .
 RUN CGO_ENABLED=0 go build -o rpa-backend cmd/main.go
 
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates bash
+RUN apk --no-cache add ca-certificates bash mysql-client
 WORKDIR /root/
 COPY --from=builder /app/rpa-backend .
 EXPOSE 8080

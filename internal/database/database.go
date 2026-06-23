@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -13,12 +14,27 @@ import (
 
 func Connect() *gorm.DB {
 	dsn := config.MySQLDSN()
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatal("DB connect error:", err)
+	var db *gorm.DB
+	var err error
+
+	for i := 1; i <= 15; i++ {
+		log.Printf("Connecting to database (attempt %d/15)...", i)
+		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err == nil {
+			break
+		}
+		log.Printf("Database connection failed: %v. Retrying in 2 seconds...", err)
+		time.Sleep(2 * time.Second)
 	}
 
-	db.AutoMigrate(&models.Job{}, &models.Run{})
+	if err != nil {
+		log.Fatal("DB connect error after retries: ", err)
+	}
+
+	err = db.AutoMigrate(&models.Job{}, &models.Run{})
+	if err != nil {
+		log.Fatal("Database migration error: ", err)
+	}
 	log.Println("MySQL database ready:", config.GetEnv("DB_NAME", "rpa"))
 	return db
 }
